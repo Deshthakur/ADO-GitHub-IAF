@@ -1,0 +1,139 @@
+{
+    "PackageInformation": {
+        "SetupType": "EXE",
+        "SetupFile": "Deploy-Application.exe",
+        "SourceFolder": "Source",
+        "OutputFolder": "Package",
+        "IconFile": "Icon.png",
+        "IconURL": "https://example.com/icon.png"
+    },
+    "Information": {
+        "DisplayName": "<replaced_by_pipeline>",
+        "AppVersion": "<replaced_by_pipeline>",
+        "Description": "<<ENTER_VALUE:[custom_text]>>",
+        "Publisher": "<replaced_by_pipeline>",
+        "Notes": "<<ENTER_VALUE:[custom_text]>>",
+        "Owner": "<<ENTER_VALUE:[custom_text]>>",
+        "ScopeTagName": "<<ENTER_VALUE:[custom_text]>>"
+    },
+    "Program": {
+        "InstallCommand": "Deploy-Application.exe Install",
+        "UninstallCommand": "Deploy-Application.exe Uninstall",
+        "InstallExperience": "<<SELECT_VALUE:[system, user]>>",
+        "DeviceRestartBehavior": "<<SELECT_VALUE:[suppress, force, basedOnReturnCode, allow]>>",
+        "AllowAvailableUninstall": "<<SELECT_VALUE:[true, false]>>"
+    },
+    "RequirementRule": {
+        "MinimumSupportedWindowsRelease": "<<SELECT_VALUE:[W10_1607, W10_1703, W10_1709, W10_1809, W10_1909, W10_2004, W10_20H2, W10_21H1, W10_21H2, W10_22H2, W11_21H2, W11_22H2]>>",
+        "Architecture": "<<SELECT_VALUE:[All, x64, x86]>>"
+    },
+    "CustomRequirementRule": [
+    ],
+    "DetectionRule": [
+        {
+            "Type": "Registry",
+            "DetectionMethod": "VersionComparison",
+            "KeyPath": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\<<ENTER_VALUE[reg_key]>>",
+            "ValueName": "DisplayVersion",
+            "Operator": "greaterThanOrEqual",
+            "Value": "<replaced_by_pipeline>",
+            "Check32BitOn64System": "<<SELECT_VALUE:[false, true]>>"
+        },
+        {
+            "Type": "Registry",
+            "DetectionMethod": "VersionComparison",
+            "KeyPath": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\###PRODUCTCODE###",
+            "ValueName": "DisplayVersion",
+            "Operator": "greaterThanOrEqual",
+            "Value": "<replaced_by_pipeline>",
+            "Check32BitOn64System": "<<SELECT_VALUE:[false, true]>>"
+        },
+        {
+            "Type": "Registry",
+            "DetectionMethod": "Existence",
+            "KeyPath": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\<<ENTER_VALUE[reg_key]>>",
+            "ValueName": "<<ENTER_VALUE:[reg_value_name]>>",
+            "DetectionType": "<<SELECT_VALUE:[exists, notExists]>>",
+            "Check32BitOn64System": "<<SELECT_VALUE:[false, true]>>"
+        },
+        {
+            "Type": "Registry",
+            "DetectionMethod": "Existence",
+            "KeyPath": "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\###PRODUCTCODE###",
+            "ValueName": "<<ENTER_VALUE:[reg_value_name]>>",
+            "DetectionType": "<<SELECT_VALUE:[exists, notExists]>>",
+            "Check32BitOn64System": "<<SELECT_VALUE:[false, true]>>"
+        },
+        {
+            "Type": "MSI",
+            "ProductCode": "<replaced_by_pipeline>",
+            "ProductVersionOperator": "<<SELECT_VALUE:[notConfigured, equal, notEqual, greaterThanOrEqual, greaterThan, lessThanOrEqual, lessThan]>>",
+            "ProductVersion": "<replaced_by_pipeline>"
+        },
+        {
+            "Type": "MSI",
+            "ProductCode": "<replaced_by_pipeline>",
+            "ProductVersionOperator": "notConfigured",
+            "ProductVersion": "<replaced_by_pipeline>"
+        },
+        {
+            "Type": "Script",
+            "ScriptFile": "detection.ps1",
+            "EnforceSignatureCheck": "<<SELECT_VALUE:[false, true]>>",
+            "RunAs32Bit": "<<SELECT_VALUE:[false, true]>>"
+        },
+        {
+            "Type": "File",
+            "DetectionMethod": "Version",
+            "Path": "C:\\Program Files\\<<ENTER_VALUE:[path]>>",
+            "FileOrFolder": "<<ENTER_VALUE:[file_name_including_extension]>>",
+            "Operator": "<<SELECT_VALUE:[equal, notEqual, greaterThanOrEqual, greaterThan, lessThanOrEqual, lessThan]>>",
+            "VersionValue": "<replaced_by_pipeline>",
+            "Check32BitOn64System": "<<SELECT_VALUE:[false, true]>>"
+        },
+        {
+            "Type": "File",
+            "DetectionMethod": "Version",
+            "Path": "C:\\Program Files (x86)\\<<ENTER_VALUE:[path]>>",
+            "FileOrFolder": "<<ENTER_VALUE:[file_name_including_extension]>>",
+            "Operator": "<<SELECT_VALUE:[equal, notEqual, greaterThanOrEqual, greaterThan, lessThanOrEqual, lessThan]>>",
+            "VersionValue": "<replaced_by_pipeline>",
+            "Check32BitOn64System": "<<SELECT_VALUE:[false, true]>>"
+        }
+    ],
+    "Assignment": [
+        {
+            "Type": "<<SELECT_VALUE[VirtualGroup]>>",
+            "GroupName": "<<SELECT_VALUE:[AllUsers, AllDevices]>>",
+            "Intent": "<<SELECT_VALUE:[available, required, uninstall]>>",
+            "Notification": "<<SELECT_VALUE:[showAll, showReboot, hideAll]>>",
+            "UseLocalTime": "<<SELECT_VALUE:[false, true]>>",
+            "FilterName": "<OPTIONAL_ENTER_VALUE:[filter_name]>>",
+            "FilterMode": "<OPTIONAL_SELECT_VALUE:[include, exclude]>>",
+            "AvailableTime": "<<OPTIONAL_ENTER_VALUE:[dmtfDateTime]>>",
+            "DeadlineTime": "<<OPTIONAL_ENTER_VALUE:[dmtfDateTime]>>",
+            "DeliveryOptimizationPriority": "<<OPTIONAL_SELECT_VALUE:[notConfigured, foreground]>>",
+            "EnableRestartGracePeriod": "<<OPTIONAL_SELECT_VALUE:[false, true]>>",
+            "RestartGracePeriodInMinutes": "<<OPTIONAL_ENTER_VALUE:[integer]>>",
+            "RestartCountDownDisplayInMinutes": "<<OPTIONAL_ENTER_VALUE:[integer]>>",
+            "RestartNotificationSnoozeInMinutes": "<<OPTIONAL_ENTER_VALUE:[integer]>>"
+        },
+        {
+            "Type": "<<SELECT_VALUE[Group]>>",
+            "GroupID": "<<ENTER_VALUE:[group_id]>>",
+            "Intent": "<<SELECT_VALUE:[available, required, uninstall]>>",
+            "GroupMode": "<<SELECT_VALUE:[included, excluded]>>",
+            "Notification": "<<SELECT_VALUE:[showAll, showReboot, hideAll]>>",
+            "UseLocalTime": "<<SELECT_VALUE:[false, true]>>",
+            "FilterName": "<OPTIONAL_ENTER_VALUE:[filter_name]>>",
+            "FilterMode": "<OPTIONAL_SELECT_VALUE:[include, exclude]>>",
+            "AvailableTime": "<<OPTIONAL_ENTER_VALUE:[dmtfDateTime]>>",
+            "DeadlineTime": "<<OPTIONAL_ENTER_VALUE:[dmtfDateTime]>>",
+            "DeliveryOptimizationPriority": "<<OPTIONAL_SELECT_VALUE:[notConfigured, foreground]>>",
+            "EnableRestartGracePeriod": "<<OPTIONAL_SELECT_VALUE:[false, true]>>",
+            "RestartGracePeriodInMinutes": "<<OPTIONAL_ENTER_VALUE:[integer]>>",
+            "RestartCountDownDisplayInMinutes": "<<OPTIONAL_ENTER_VALUE:[integer]>>",
+            "RestartNotificationSnoozeInMinutes": "<<OPTIONAL_ENTER_VALUE:[integer]>>"
+        }
+    ]
+}

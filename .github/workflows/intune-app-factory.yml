@@ -1,0 +1,77 @@
+name: Intune App Factory
+
+on:
+  workflow_dispatch:
+    inputs:
+      operational_mode:
+        description: 'Verify = validate only; Package = download and prepare; Publish = upload to Intune and assign'
+        type: choice
+        required: true
+        default: Package
+        options:
+          - Verify
+          - Package
+          - Publish
+      archive_mode:
+        description: 'Archive prepared app packages to Azure Storage before publishing'
+        type: choice
+        required: true
+        default: 'No'
+        options:
+          - 'No'
+          - 'Yes'
+  schedule:
+    # Scheduled runs are package-only by design. Publishing/assignment is manual and approval-gated.
+    - cron: '0 */6 * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: intune-app-factory-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  intune-app-factory:
+    name: ${{ github.event_name == 'schedule' && 'Scheduled package build' || format('{0} run', github.event.inputs.operational_mode) }}
+    runs-on: self-hosted
+    timeout-minutes: 360
+    # Configure intune-production with required reviewers in GitHub Settings > Environments.
+    # Non-publish runs use an unprotected environment.
+    environment:
+      name: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.operational_mode == 'Publish' && 'intune-production' || 'intune-nonprod' }}
+    defaults:
+      run:
+        shell: pwsh
+    env:
+      IAF_MODE: ${{ github.event_name == 'schedule' && 'Package' || github.event.inputs.operational_mode }}
+      IAF_ARCHIVE_MODE: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.archive_mode || 'No' }}
+      IAF_TENANT_ID: ${{ secrets.TENANT_ID }}
+      IAF_CLIENT_ID: ${{ secrets.CLIENT_ID }}
+      IAF_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+      IAF_STORAGE_ACCOUNT_ACCESS_KEY: ${{ secrets.STORAGE_ACCOUNT_ACCESS_KEY }}
+      IAF_ARCHIVE_STORAGE_ACCOUNT_NAME: ${{ vars.ARCHIVE_STORAGE_ACCOUNT_NAME }}
+      IAF_ARCHIVE_CONTAINER_NAME: ${{ vars.ARCHIVE_CONTAINER_NAME }}
+      IAF_LOG_ANALYTICS_WORKSPACE_ID: ${{ vars.REPORT_WORKSPACE_ID }}
+      IAF_LOG_ANALYTICS_SHARED_KEY: ${{ secrets.LOG_ANALYTICS_SHARED_KEY }}
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          clean: true
+          fetch-depth: 1
+
+      - name: Validate runner and execute Intune App Factory
+        run: ./.github/scripts/Invoke-IntuneAppFactory.ps1
+
+      - name: Upload build output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: intune-app-factory-${{ github.run_number }}
+          path: |
+            ${{ runner.temp }}/IntuneAppFactory/Publish/**
+            ${{ runner.temp }}/IntuneAppFactory/Artifacts/**
+          if-no-files-found: warn
+          retention-days: 14
