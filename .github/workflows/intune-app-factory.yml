@@ -42,7 +42,7 @@ jobs:
       name: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.operational_mode == 'Publish' && 'intune-production' || 'intune-nonprod' }}
     defaults:
       run:
-        shell: pwsh
+        shell: powershell
     env:
       IAF_MODE: ${{ github.event_name == 'schedule' && 'Package' || github.event.inputs.operational_mode }}
       IAF_ARCHIVE_MODE: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.archive_mode || 'No' }}
